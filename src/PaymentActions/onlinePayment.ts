@@ -10,7 +10,7 @@ export async function onlinePaymentAction(id: string , values: object) {
         throw new Error("Login First")
     }
 
-    const {data} = await axios.post(`https://ecommerce.routemisr.com/api/v1/orders/checkout-session/${id}?url=http://localhost:3000` , values , {
+    const {data} = await axios.post(`https://ecommerce.routemisr.com/api/v1/orders/checkout-session/${id}?url=http://${process.env.VERCEL_URL}` , values , {
         headers: {
             token : token as string
         }
