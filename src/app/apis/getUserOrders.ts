@@ -7,13 +7,17 @@ import { jwtDecode } from "jwt-decode"
 export async function getUserOrders(){
     const token = await getMyToken()
 
-    const {id} = jwtDecode(token)
-
     if(!token) {
         throw new Error("Login First")
     }
 
-    const {data} = await axios.get(`https://ecommerce.routemisr.com/api/v1/orders/user/${id}`)
+    const {id} = jwtDecode(token as string) as { id: string }
+
+    const {data} = await axios.get(`https://ecommerce.routemisr.com/api/v1/orders/user/${id}` , {
+        headers: {
+            token: token as string
+        }
+    })
 
     return data
 }

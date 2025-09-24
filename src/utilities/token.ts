@@ -4,15 +4,25 @@ import { cookies } from "next/headers";
 
 
 export async function getMyToken() {
+    const cookieStore = await cookies()
 
-    const x = (await cookies()).get("next-auth.session-token")?.value
+    // Support both insecure and secure cookie names (production uses __Secure- prefix)
+    const rawSessionToken =
+        cookieStore.get("next-auth.session-token")?.value ||
+        cookieStore.get("__Secure-next-auth.session-token")?.value ||
+        // Fallbacks for newer Auth.js cookie names if ever used
+        cookieStore.get("authjs.session-token")?.value ||
+        cookieStore.get("__Secure-authjs.session-token")?.value
 
+    if (!rawSessionToken) {
+        return undefined
+    }
 
-    const token = await decode({
-        token: x,
+    const decoded = await decode({
+        token: rawSessionToken,
         secret: process.env.NEXTAUTH_SECRET!
     })
 
-   return token?.token
+    return decoded?.token
     
 }
