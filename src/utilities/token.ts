@@ -18,11 +18,15 @@ export async function getMyToken() {
         return undefined
     }
 
-    const decoded = await decode({
-        token: rawSessionToken,
-        secret: process.env.NEXTAUTH_SECRET!
-    })
-
-    return decoded?.token
+    try {
+        const decoded = await decode({
+            token: rawSessionToken,
+            secret: process.env.NEXTAUTH_SECRET!
+        })
+        return decoded?.token
+    } catch (err) {
+        // If decoding fails (wrong/rotated secret or malformed token), treat as unauthenticated
+        return undefined
+    }
     
 }
