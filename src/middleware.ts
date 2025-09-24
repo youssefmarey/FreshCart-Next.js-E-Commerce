@@ -8,7 +8,7 @@ export async function middleware(request: NextRequest) {
 
   const {pathname} =    request.nextUrl
   const authPage = ["/login" , "/register"]
-  const routes = ["/", "/allorders" ,"/payment", "/brands" , "/categories" , "/cart" , "/productDetails"]
+  const routes = ["/allorders" ,"/payment", "/brands" , "/categories" , "/cart" , "/productDetails"]
 
   if(!token && routes.includes(pathname)) {
     return NextResponse.redirect(new URL('/login' , request.url))
@@ -25,5 +25,5 @@ export async function middleware(request: NextRequest) {
  
 // See "Matching Paths" below to learn more
 export const config = {
-  matcher: ["/", "/allorders" ,"/payment" , "/brands" , "/categories" , "/cart" , "/productDetails" , "/login" , "/register"]
+  matcher: ["/allorders" ,"/payment" , "/brands" , "/categories" , "/cart" , "/productDetails" , "/login" , "/register"]
 }
