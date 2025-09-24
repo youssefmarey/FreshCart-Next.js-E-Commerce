@@ -71,26 +71,21 @@ const Payment = () => {
     try {
         const data = await onlinePaymentAction(cartId , values)
 
-        console.log(data);
-
-        if(data.status === "success") {
+        if(data?.status === "success") {
             window.location.href = data.session.url
+            return
         }
+
+        // Show error returned by server action
+        if(data?.status === "error") {
+            toast.error(data.message || "Checkout session failed", { position: "top-center" })
+            return
+        }
+
+        toast.error("Checkout session failed", { position: "top-center" })
         
-
-
-        // toast.success(data.status , {
-        //     position:"top-center",
-        //     duration:1000
-        // })
-
-        // afterPayment()
-
-        // router.push("/allorders")
-        
-    } catch (error) {
-        console.log(error);
-        
+    } catch (error: any) {
+        toast.error(error?.message || "Unexpected error", { position: "top-center" })
     }
 
     
