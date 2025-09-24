@@ -10,8 +10,13 @@ export async function onlinePaymentAction(id: string , values: object) {
         throw new Error("Login First")
     }
 
-    const callbackUrl = process.env.NEXTAUTH_URL
-    const {data} = await axios.post(`https://ecommerce.routemisr.com/api/v1/orders/checkout-session/${id}?url=${callbackUrl}` , values , {
+    if(!id) {
+        throw new Error("Cart is empty")
+    }
+
+    const callbackUrl = process.env.NEXTAUTH_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000")
+    const encodedUrl = encodeURIComponent(callbackUrl)
+    const {data} = await axios.post(`https://ecommerce.routemisr.com/api/v1/orders/checkout-session/${id}?url=${encodedUrl}` , values , {
         headers: {
             token : token as string
         }
