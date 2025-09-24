@@ -1,6 +1,5 @@
 "use server"
 import { getMyToken } from "@/utilities/token";
-import axios from "axios";
 
 
 export async function onlinePaymentAction(id: string , values: object) {
@@ -14,16 +13,27 @@ export async function onlinePaymentAction(id: string , values: object) {
         return { status: "error", message: "Cart is empty" }
     }
 
-    const callbackUrl = process.env.NEXTAUTH_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000")
+    const env: any = (globalThis as any)?.process?.env || {}
+    const callbackUrl = env.NEXTAUTH_URL || (env.VERCEL_URL ? `https://${env.VERCEL_URL}` : "http://localhost:3000")
+    const url = `https://ecommerce.routemisr.com/api/v1/orders/checkout-session/${id}?url=${encodeURIComponent(callbackUrl)}`
     try {
-        const {data} = await axios.post(`https://ecommerce.routemisr.com/api/v1/orders/checkout-session/${id}?url=${callbackUrl}` , values , {
+        const res = await fetch(url, {
+            method: "POST",
             headers: {
-                token : token as string
-            }
+                "Content-Type": "application/json",
+                token: token as string,
+            },
+            body: JSON.stringify(values),
+            cache: "no-store",
         })
+
+        const data = await res.json()
+        if (!res.ok) {
+            return { status: "error", message: data?.message || "Checkout session failed" }
+        }
         return data
     } catch (err: any) {
-        const apiMsg = err?.response?.data?.message || err?.message || "Checkout session failed"
+        const apiMsg = err?.message || "Checkout session failed"
         return { status: "error", message: apiMsg }
     }
 }
